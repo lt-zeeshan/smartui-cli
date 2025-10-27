@@ -12,6 +12,7 @@ import processSnapshots from '../tasks/processSnapshot.js'
 import finalizeBuild from '../tasks/finalizeBuild.js'
 import snapshotQueue from '../lib/snapshotQueue.js'
 import startTunnel from '../tasks/startTunnel.js'
+import getEnv from '../lib/env.js'
 
 const command = new Command();
 
@@ -43,6 +44,9 @@ command
         ctx.totalSnapshots = 0
         ctx.sourceCommand = 'exec'
 
+        const env = getEnv();
+        const useSimpleRenderer = env.LT_SDK_SKIP_EXECUTION_LOGS;
+
         let tasks = new Listr<Context>(
             [
                 authExec(ctx),
@@ -55,6 +59,7 @@ command
                 finalizeBuild(ctx)
             ],
             {
+                renderer: useSimpleRenderer ? 'simple' : undefined,
                 rendererOptions: {
                     icon: {
                         [ListrDefaultRendererLogLevels.OUTPUT]: `→`
